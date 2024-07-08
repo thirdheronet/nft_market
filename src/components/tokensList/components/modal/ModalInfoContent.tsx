@@ -1,4 +1,5 @@
 import { TokenInterface } from "../Token";
+import { ethers } from "ethers";
 
 const ModalInfoContent = ({ data, tokenSymbol }: { data: TokenInterface, tokenSymbol: string }) => {
     const attrsValues = Object.values(data.attributes);
@@ -6,7 +7,7 @@ const ModalInfoContent = ({ data, tokenSymbol }: { data: TokenInterface, tokenSy
     return <>
         <div>section: {data.section}</div>
         <div>owner: <a href={"#"} className={"text-sm"}>{data.owner}</a></div>
-        <div>cost: {Number(data.salePrice).toFixed(2)} ({tokenSymbol})</div>
+        <div>cost: {ethers.utils.formatEther(data.salePrice)} ({tokenSymbol})</div>
 
         <div className={"my-2"}></div>
 

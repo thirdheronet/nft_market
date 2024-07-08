@@ -11,7 +11,7 @@ interface TokensProps {
 
 export default function Tokens({ tokens }: TokensProps) {
     const [tokenSymbol, setTokenSymbol] = useState<string>("");
-    console.log("VITE_PUBLIC_PAYMENT_TOKEN_CONTRACT_ADDRESS", import.meta.env.VITE_PUBLIC_PAYMENT_TOKEN_CONTRACT_ADDRESS);
+   
     useEffect(() => {
         const fetchSymbol = async () => {
             let symbol = await readContract(wagmiConfig, {

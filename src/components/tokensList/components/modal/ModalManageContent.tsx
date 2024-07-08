@@ -22,7 +22,7 @@ const ModalManageContent = ({ data, tokenSymbol, onSalePriceChange }: {
         if (txState !== "success") {
             return;
         }
-
+    
         onSalePriceChange(currentPrice);
 
         dispatch(modalClose());
@@ -68,7 +68,7 @@ const ModalManageContent = ({ data, tokenSymbol, onSalePriceChange }: {
                 <input
                     className={"bg-gray-700 w-full p-2 font-bold rounded-md"}
                     required
-                    value={currentPrice} type={"number"} min={0} max={999999} onChange={(e) => {
+                    value={currentPrice} type={"number"} min={0} onChange={(e) => {
                         setCurrentPrice(Number(e.target.value));
                     }} />
                 <div>{tokenSymbol}</div>

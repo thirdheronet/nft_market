@@ -24,7 +24,6 @@ export default function Filter() {
             args: []
         }).then((res) => {
             const newSections: SectionCheckbox[] = [];
-
             res.map((item) => {
                 newSections.push({ name: item, checked: true });
             });

@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useWeb3Modal } from "@web3modal/scaffold-react";
 import { FaInfo, FaShoppingBasket } from "react-icons/fa";
-import { Address, WriteContractErrorType } from "viem";
 import { readContract, signTypedData } from "@wagmi/core";
 import { ethers } from "ethers";
 import { useAccount, useWriteContract } from "wagmi";
@@ -12,10 +11,11 @@ import { wagmiConfig } from "../../../context/Web3Provider";
 import { useAppDispatch } from "../../../utils/reducer";
 import { modalOpen } from "../../../reducer/modal";
 import fetchJsonData from "../../../utils/fetchJsonData";
+import { Address } from "viem";
 
 export interface TokenBase {
-    id: number;
-    salePrice: number;
+    id: bigint;
+    salePrice: bigint;
 
     equipped: boolean;
 
@@ -83,7 +83,7 @@ const getSignature = async (cost: number, owner: Address) => {
                 spender: import.meta.env.VITE_PUBLIC_ITEMS_CONTRACT_ADDRESS as Address,
                 value: BigInt(cost),
                 nonce: await getNonce(owner),
-                deadline: BigInt(1749805184),
+                deadline: BigInt(Date.now() * 72 * 60 * 60 * 1000),
             }
         });
 
@@ -94,6 +94,7 @@ const getSignature = async (cost: number, owner: Address) => {
 };
 
 export default function Token({ data, tokenSymbol }: TokenProps) {
+    console.log(data);
     const [token, setToken] = useState<TokenInterface>(data);
     const { isDisconnected, address } = useAccount();
     const dispatch = useAppDispatch()
@@ -101,7 +102,7 @@ export default function Token({ data, tokenSymbol }: TokenProps) {
     const { writeContractAsync } = useWriteContract()
 
     const onSalePriceChangeHandler = useCallback((newPrice: number) => {
-        setToken({ ...token, ...{ salePrice: newPrice } })
+        setToken({ ...token, ...{ salePrice: BigInt(newPrice * 10 ** 18) } })
     }, [token]);
 
     const onBuyHandler = useCallback(async (tokenId: number) => {
@@ -111,7 +112,7 @@ export default function Token({ data, tokenSymbol }: TokenProps) {
             return;
         }
 
-        await getSignature(token.salePrice, address as Address).then(async (res) => {
+        await getSignature(Number(token.salePrice), address as Address).then(async (res) => {
             if (res === undefined) {
                 return;
             }
@@ -122,14 +123,14 @@ export default function Token({ data, tokenSymbol }: TokenProps) {
                 functionName: 'acceptOfferSale',
                 args: [
                     BigInt(tokenId),
-                    BigInt(1749805184),
+                    BigInt(Date.now() * 72 * 60 * 60 * 1000),
                     res.v,
-                    res.r as `0x${string}`,
-                    res.s as `0x${string}`
+                    res.r as Address,
+                    res.s as Address
                 ],
             }).then((res) => {
                 console.log(res);
-            }).catch((e: WriteContractErrorType) => {
+            }).catch((e) => {
                 console.log(e.message);
             })
         }).catch((e) => {
@@ -200,7 +201,7 @@ export default function Token({ data, tokenSymbol }: TokenProps) {
                 {/* BUY BUTTON */}
                 {token.owner !== address ? (
                     <button className={"bg-green-600 w-full rounded-md p-1 border-2 border-gray-700 flex-[1/3]"}
-                        onClick={() => onBuyHandler(token.id)}>
+                        onClick={() => onBuyHandler(Number(token.id))}>
                         <FaShoppingBasket className={"m-auto text-lime-200 text-xl"} />
                     </button>
                 ) : (<button
