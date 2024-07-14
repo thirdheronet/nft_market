@@ -4,10 +4,10 @@ import { readContract } from "@wagmi/core";
 import { Address } from "viem";
 import Tokens from "../tokensList/components/Tokens";
 import { TokenInterface } from "../tokensList/components/Token";
-import { COLLECTION_TOKEN_ABI } from "../tokensList/constants/abi";
 import { useAppSelector } from "../../utils/reducer";
 import { wagmiConfig } from "../../context/Web3Provider";
 import { SectionCheckbox } from "../filter/Filter";
+import { COLLECTION_TOKEN_ABI } from "../tokensList/constants/abi";
 
 export default function Market() {
     const [tokens, setTokens] = useState<TokenInterface[]>([]);

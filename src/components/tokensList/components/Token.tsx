@@ -53,12 +53,12 @@ const getNonce = async (owner: Address) => {
     });
 };
 
-const getSignature = async (cost: number, owner: Address) => {
+const getSignature = async (cost: bigint, owner: Address, deadline: bigint) => {
     try {
         const signature = await signTypedData(wagmiConfig, {
             domain: {
                 name: import.meta.env.VITE_TOKEN_SHORTCUT || "",
-                version: import.meta.env.VITE_DAPP_VERSION || "",
+                version: import.meta.env.VITE_TOKEN_VERSION || "",
                 chainId: BigInt(import.meta.env.VITE_DAPP_CHAIN_ID || ""),
                 verifyingContract: import.meta.env.VITE_PUBLIC_PAYMENT_TOKEN_CONTRACT_ADDRESS as Address
             },
@@ -81,9 +81,9 @@ const getSignature = async (cost: number, owner: Address) => {
             message: {
                 owner: owner,
                 spender: import.meta.env.VITE_PUBLIC_ITEMS_CONTRACT_ADDRESS as Address,
-                value: BigInt(cost),
+                value: cost,
                 nonce: await getNonce(owner),
-                deadline: BigInt(Date.now() * 72 * 60 * 60 * 1000),
+                deadline: deadline,
             }
         });
 
@@ -94,7 +94,6 @@ const getSignature = async (cost: number, owner: Address) => {
 };
 
 export default function Token({ data, tokenSymbol }: TokenProps) {
-    console.log(data);
     const [token, setToken] = useState<TokenInterface>(data);
     const { isDisconnected, address } = useAccount();
     const dispatch = useAppDispatch()
@@ -112,7 +111,9 @@ export default function Token({ data, tokenSymbol }: TokenProps) {
             return;
         }
 
-        await getSignature(Number(token.salePrice), address as Address).then(async (res) => {
+        const deadline = BigInt(Date.now() + 24 * 60 * 60 * 1000);
+
+        await getSignature(token.salePrice, address as Address, deadline).then(async (res) => {
             if (res === undefined) {
                 return;
             }
@@ -123,18 +124,18 @@ export default function Token({ data, tokenSymbol }: TokenProps) {
                 functionName: 'acceptOfferSale',
                 args: [
                     BigInt(tokenId),
-                    BigInt(Date.now() * 72 * 60 * 60 * 1000),
+                    deadline,
                     res.v,
                     res.r as Address,
                     res.s as Address
                 ],
-            }).then((res) => {
-                console.log(res);
+            }).then((_res) => {
+                // console.log(res);
             }).catch((e) => {
-                console.log(e.message);
+                console.log("error: ", e.message);
             })
         }).catch((e) => {
-            console.log(e);
+            console.log("error:", e);
         })
 
     }, [isDisconnected]);

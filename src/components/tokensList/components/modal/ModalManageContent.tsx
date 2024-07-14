@@ -22,7 +22,7 @@ const ModalManageContent = ({ data, tokenSymbol, onSalePriceChange }: {
         if (txState !== "success") {
             return;
         }
-    
+
         onSalePriceChange(currentPrice);
 
         dispatch(modalClose());
