@@ -22,7 +22,7 @@ export default function Market() {
                 functionName: 'getFilteredItems',
                 args: [false, Object.values(filterState.sections.map((item: SectionCheckbox) => item.name as Address))]
             });
-            console.log("newTokens", newTokens);
+
             // sections filter
             newTokens = newTokens?.filter((item) => Number(item.id) !== 0);
 
