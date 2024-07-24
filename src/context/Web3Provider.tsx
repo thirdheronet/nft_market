@@ -26,7 +26,7 @@ export const wagmiConfig = defaultWagmiConfig({
     projectId,
     chains,
     metadata,
-    enableCoinbase: false,
+    enableCoinbase: false
 })
 
 // 3. Create modal
@@ -35,6 +35,7 @@ createWeb3Modal({
     projectId,
     enableAnalytics: false,
     allowUnsupportedChain: true,
+
     tokens: {
         [import.meta.env.VITE_DAPP_CHAIN_ID]: {
             address: import.meta.env.VITE_PUBLIC_PAYMENT_TOKEN_CONTRACT_ADDRESS + "",
